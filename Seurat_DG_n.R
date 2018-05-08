@@ -250,8 +250,8 @@ p1 <- LabelUR(p1, genes = genes.to.label1, avg.t.cells,
 #Ben's code for Violin plot and Feature plot for loop
 genes_of_interest <- list(
  
-  #'NSC lineage'              = c("Sox9", "Id4", "Clu", "Hmgn2", "Ccnd2", "Neurod1", "Cd24a", "Syt5", "ECEV4806transgene" ),
-  'gene_select'              = c("ECEV4806transgene","Aqp4", "Gfap", "Aldh1l1", "Sox9", "Lpar1", "Sox2", "Nes", "Prom1", "Top2a", "Cdk1", "Ccnd2", "Dcx", "Sox11", "Ascl1" , "Dbi","Kcne1l", "Nudt4", "Mia", "Sox4", "Ube2c", "Islr2")
+  'NSC lineage_1'             = c("Sox9", "Id4", "Clu", "Hmgn2", "Ccnd2", "Neurod1", "Cd24a", "Syt5", "ECEV4806transgene"),
+  'gene_select'              = c("ECEV4806transgene","Aqp4", "Gfap", "Aldh1l1", "Sox9", "Lpar1", "Sox2", "Nes", "Prom1", "Top2a", "Cdk1", "Ccnd2", "Dcx", "Sox11", "Ascl1" , "Dbi","Kcne1l", "Nudt4", "Mia", "Sox4", "Ube2c", "Islr2"),
   'NSC lineage'              = c("Sox9", "Aldh1l1", "Lpar1", "Nes", "Cdk1", "Eomes", "Neurod1" , "Rbfox3","ECEV4806transgene" ),
   'Transgene'                = c("ECEV4806transgene"),
   'Stem Cells'               = c("Aldoc", "Apoe", "Id4", "Hopx", "Sox9", "Gfap", "Slc1a3", "Sox2", "Fabp7", "Clu"),
