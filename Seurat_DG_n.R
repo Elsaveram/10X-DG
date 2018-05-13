@@ -6,7 +6,7 @@ library(Matrix)
 library(stringr)
 
 # This assumes your script is in a folder called "src" at the top level of all the results.
-project_folder <- file.path(dirname(rstudioapi::getSourceEditorContext()$path), ".." )
+project_folder <- file.path(dirname(rstudioapi::getSourceEditorContext()$path), "../.." )
 analysis_folder <- file.path(project_folder,"Results/Sample234")
 
 #Load Seurat object if it exist
@@ -248,6 +248,10 @@ p1 <- LabelUR(p1, genes = genes.to.label1, avg.t.cells,
 
 #other.lineage.clusters <- c("immature neurons", "interneurons", "pericytes", "microglia", "endothelial", "macrophages", "VLMC")
 #Ben's code for Violin plot and Feature plot for loop
+
+# Use this to grab a subset of clusters
+pbmc <- SubsetData(pbmc, ident.use = c("RG-like quiescent","RG-like active"), subset.raw = T)
+
 genes_of_interest <- list(
  
   'NSC lineage_1'             = c("Sox9", "Id4", "Clu", "Hmgn2", "Ccnd2", "Neurod1", "Cd24a", "Syt5", "ECEV4806transgene"),
