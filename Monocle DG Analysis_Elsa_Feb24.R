@@ -17,7 +17,7 @@ analysis_folder <- file.path(project_folder,"Results/Sample234")
 
 #Load Seurat or Monocle object if it exist
 load( file = file.path(project_folder, 'HSMM_Negative_Low_High_filtering_h_0418.Robj') )
-load( file = file.path(project_folder, 'PositiveAndNegative.Robj') )
+load( file = file.path(project_folder, 'Negative_Low_High_filtering_h_060818.Robj') )
 
 #Import Seurat object
 HSMM <- importCDS(pbmc, import_all = T)
@@ -33,15 +33,16 @@ head(pData(HSMM))
 # c( 0, 1, 3, 4, 18, 19, 8, 10, 12)
 RGL.and.IPC <- c( "RG-like quiescent", "RG-like active", "NPC", "neuroblast")
 neurogenic.lineage.clusters <- c( "NSCs", "neuroblast?", "early NPCs", "late NPCs", "mature granular neurons")
-oligodendrocytes.lineage.clusters <- c("OL progenitor?", "OPCs", "activated OPC", "commited OPC","mature OLs")
+oligodendrocytes.lineage.clusters <- c("early OPC", "OPC", "activated OPC", "young OL", "mature OL" )
 other.lineage.clusters <- c("pericytes", "micoglia", "interneurons", "endothelial cells")
-
-valid_cells <- row.names(subset(pData(HSMM), is.element(Clusters, c(RGL.and.IPC))))
+RGL <- c( "RGL-1", "RGL-2", "NPC", "neuroblast")
+valid_cells <- row.names(subset(pData(HSMM), is.element(Clusters, c(RGL))))
 HSMM <- HSMM[,valid_cells]
 
 expressed_genes <- row.names(subset(fData(HSMM), num_cells_expressed >= 10))
 
 HSMM <- detectGenes(HSMM, min_expr = 0.1)
+
 
 # Unsupervised clustering
 disp_table <- dispersionTable(HSMM)
@@ -115,7 +116,7 @@ plot_cell_clusters(HSMM, color_by = 'as.factor(State)')
 # #####
 
 # Save our objects as they take a VERY long time to generate (with 1 core)
-save (HSMM, file = file.path(project_folder, 'HSMM_Negative_Low_High_filtering_h_0418.Robj') )
+save (HSMM, file = file.path(project_folder, 'HSMM_Negative_Low_High_filtering_oligo_0510.Robj') )
 
 load( file = file.path(project_folder, 'HSMM_Neurogenic_Lineage_0224.Robj') )
 
@@ -176,19 +177,27 @@ expressed_genes <- row.names(subset(fData(HSMM), num_cells_expressed >= 10))
 #########
 #OPC lineage
 #########
-Pdgfra_id <- row.names(subset(fData(HSMM), gene_short_name == "Pdgfra"))
+Sox9_id <- row.names(subset(fData(HSMM), gene_short_name == "Sox9"))
+Olig2_id <- row.names(subset(fData(HSMM), gene_short_name == "Olig2"))
+Top2a_id <- row.names(subset(fData(HSMM), gene_short_name == "Top2a"))
 Fyn_id <-row.names(subset(fData(HSMM), gene_short_name == "Fyn"))
 Plp1_id <- row.names(subset(fData(HSMM), gene_short_name == "Plp1"))
 cth <- newCellTypeHierarchy()
 
 cth <- addCellType(cth,
-                   "OPCs",
-                   classify_func = function(x) { x[Pdgfra_id,] >= 1.5 })
+                   "early OPC",
+                   classify_func = function(x) { x[Sox9_id,] >= 0.9 })
 cth <- addCellType(cth,
-                   "commited OPC",
+                   "OPC",
+                   classify_func = function(x) { x[Olig2_id,] >= 0.9 })
+cth <- addCellType(cth,
+                   "activated OPC",
+                   classify_func = function(x) { x[Top2a_id,] >= 0.9 })
+cth <- addCellType(cth,
+                   "young OL",
                    classify_func = function(x) { x[Fyn_id,] >= 2 })
 cth <- addCellType(cth,
-                   "mature OLs",
+                   "mature OL",
                    classify_func = function(x) { x[Plp1_id,] >= 4 })
 
 
@@ -253,9 +262,15 @@ generate.pseudo.plot <- function( genes ) {
 #OL genes:
 
 #generate.pseudo.plot(c("ECEV4806transgene"))
-#generate.pseudo.plot(c("Olig1", "Olig2", "Sox10", "Pdgfra", "Cspg4"))
-#generate.pseudo.plot(c("Bmp4", "Fyn", "Gpr17"))
-#generate.pseudo.plot(c("Plp1", "Mal", "Mog", "Mbp"))
+
+
+generate.pseudo.plot(c("Sox9", "Olig2","Pdgfra"))
+generate.pseudo.plot(c("Bmp4", "Fyn", "Gpr17"))
+generate.pseudo.plot(c("Plp1", "Mal", "Mog"))
+
+generate.pseudo.plot(c("Olig1", "Olig2", "Sox10", "Pdgfra", "Cspg4"))
+generate.pseudo.plot(c("Bmp4", "Fyn", "Gpr17"))
+generate.pseudo.plot(c("Plp1", "Mal", "Mog", "Mbp"))
 
 #Summary_genes OL:
 generate.pseudo.plot(c("Lpar1", "Nes", "Prom1"))
@@ -277,8 +292,9 @@ generate.pseudo.plot(c("Sox2", "Clu","Slc1a3", "Gfap"))
 generate.pseudo.plot(c('Ccnd2', "Neurod1",'Dcx', 'Gria1'))
 
 #New_gene_candidates:"Mia", "Dynlrb2", "Ascl1", "Kcne1l", "Igfbp5", "Ube2c", 'Cks2', "Islr2"
-generate.pseudo.plot(c("Mia", "Kcne1l", "Igfbp5"))
-generate.pseudo.plot(c("Ube2c", 'Cks2', "Islr2"))
+
+generate.pseudo.plot(c("Thrsp", "Hes6", "Igfbp5"))
+generate.pseudo.plot(c("Dynlrb2", 'Tmem212', "Fam183b"))
 
 #Clustering Genes by Pseudotemporal Expression Pattern
 #Run top_genes from Seurat FIRST
@@ -287,14 +303,14 @@ generate.pseudo.plot(c("Ube2c", 'Cks2', "Islr2"))
 
 
 top_15 <- (top_genes %>% filter(cluster %in% c("RG-like quiescent", "RG-like active", "NPC", "neuroblast") ))$gene
-
+top_15 <- (top_genes %>% filter(cluster %in% c("early OPC", "OPC", "activated OPC", "young OL", "mature OL" ) ))$gene
 marker_genes <- row.names(subset(fData(HSMM),
                                  gene_short_name %in% top_15 ))
 diff_test_res <- differentialGeneTest(HSMM[marker_genes,],
                                       fullModelFormulaStr = "~sm.ns(Pseudotime)")
 sig_gene_names <- row.names(subset(diff_test_res, qval < 0.1))
 plot_pseudotime_heatmap(HSMM[sig_gene_names,],
-                        num_clusters = 3,
+                        num_clusters = 5,
                         cores = 1,
                         show_rownames = T)
 write.csv(, file = file.path(project_folder, 'Negative_Low_High_filtering_h_pseudotime_markers_30.csv') )
